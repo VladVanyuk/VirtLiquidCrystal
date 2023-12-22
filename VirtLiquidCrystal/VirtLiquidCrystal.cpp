@@ -487,13 +487,6 @@ void VirtLiquidCrystal::backlight(void)
 
 //
 // Switch off the backlight
-/*!
-    @function
-    @abstract   Switch-off the LCD backlight.
-    @discussion Switch-off the LCD backlight.
-    The setBacklightPin has to be called before setting the backlight for
-    this method to work. @see setBacklightPin.
-    */
 void VirtLiquidCrystal::noBacklight(void)
 {
    switch (_polarity)
@@ -510,13 +503,6 @@ void VirtLiquidCrystal::noBacklight(void)
 
 //
 // Switch fully on the LCD (backlight and LCD)
-/*!
-    @function
-    @abstract   Switch on the LCD module.
-    @discussion Switch on the LCD module, it will switch on the LCD controller
-    and the backlight. This method has the same effect of calling display and
-    backlight. @see display, @see backlight
-    */
 void VirtLiquidCrystal::on(void)
 {
    display();
@@ -525,50 +511,21 @@ void VirtLiquidCrystal::on(void)
 
 //
 // Switch fully off the LCD (backlight and LCD)
-/*!
-    @function
-    @abstract   Switch off the LCD module.
-    @discussion Switch off the LCD module, it will switch off the LCD controller
-    and the backlight. This method has the same effect of calling noDisplay and
-    noBacklight. @see display, @see backlight
-    */
 void VirtLiquidCrystal::off(void)
 {
    noBacklight();
    noDisplay();
 }
 
-// General LCD commands - generic methods used by the rest of the commands
-// ---------------------------------------------------------------------------
-/*!
-    @function
-    @abstract   Send a command to the LCD.
-    @discussion This method sends a command to the LCD by setting the Register
-    select line of the LCD.
+//& General LCD commands - generic methods used by the rest of the commands
+//& ---------------------------------------------------------------------------
 
-    This command shouldn't be used to drive the LCD, only to implement any other
-    feature that is not available on this library.
-
-    @param      value[in] Command value to send to the LCD (COMMAND, DATA or
-    FOUR_BITS).
-    */
 void VirtLiquidCrystal::command(uint8_t value)
 {
    send(value, COMMAND);
 }
 
 #if (ARDUINO < 100)
-/*!
-    @function
-    @abstract   Writes to the LCD.
-    @discussion This method writes character to the LCD in the current cursor
-    position.
-
-    This is the virtual write method, implemented in the Print class, therefore
-    all Print class methods will end up calling this method.
-
-    @param      value[in] Value to write to the LCD.
-    */
 void VirtLiquidCrystal::write(uint8_t value)
 {
    send(value, DATA);
@@ -590,11 +547,3 @@ void VirtLiquidCrystal::setDelay(uint8_t cmdDelay)
 #endif
 }
 
-// void VirtLiquidCrystal:: ::pulseEnable(uint8_t _data) //i2c
-//{
-//    expanderWrite(_data | En); // En high
-//    delayMicroseconds(1);      // enable pulse must be >450ns
-//
-//    expanderWrite(_data & ~En); // En low
-//    delayMicroseconds(50);      // commands need > 37us to settle
-// }
