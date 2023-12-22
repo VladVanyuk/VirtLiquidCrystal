@@ -1,0 +1,34 @@
+
+
+
+
+/**
+
+@defgroup LCD_Commands
+@brief LCD command code definitions
+This section defines constants for the various commands that can be sent to the LCD.*/
+/**
+
+
+/**
+
+@fn virtual void send(uint8_t value, uint8_t mode)
+@brief Send data or commands to the LCD
+This pure virtual method must be implemented by the device specific subclass to physically send data and commands to the LCD.
+@param value - the data or command to send
+@param mode - DATA or COMMAND to indicate data or command*/
+/**
+
+@fn void createChar(uint8_t location, uint8_t charmap[])
+@brief Create a custom character for the LCD
+Writes a custom character glyph to the LCD CGRAM at the specified location.
+This can then be displayed by writing the location value.
+@param location - The LCD CGRAM location 0-7
+@param charmap - The bitmap array representing the glyph*/
+/**
+
+@fn void setBacklightPin(uint8_t value, t_backlighPol pol)
+@brief Configure the backlight pin and polarity
+This virtual method can be overridden to configure the backlight pin and polarity for the LCD backlight control.
+@param value - the pin connected to the LCD backlight
+@param pol - the active polarity for the backlight pin*/
