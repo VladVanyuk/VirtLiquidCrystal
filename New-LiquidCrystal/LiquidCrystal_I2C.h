@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <Print.h>
 
-#include "I2CIO.h"
+#include "I2C_IO.h"
 #include "LCD.h"
 
 
@@ -55,7 +55,7 @@ private:
    uint8_t _backlightPinMask; // Backlight IO pin mask
    uint8_t _backlightStsMask; // Backlight status mask
 
-   I2CIO   _i2cio;            // I2CIO PCF8574* expansion module driver I2CLCDextraIO
+   I2C_IO   _i2cio;            // I2C_IO PCF8574* expansion module driver I2CLCDextraIO
 
    uint8_t _En;               // LCD expander word for enable pin
    uint8_t _Rw;               // LCD expander word for R/W pin

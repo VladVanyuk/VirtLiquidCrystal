@@ -24,15 +24,18 @@ uint8_t VirtLiquidCrystal::init(uint8_t cols, uint8_t lines, uint8_t charsize = 
    _cols = cols;
    _rows = lines;
    _charsize = charsize;
-  // _polarity = POSITIVE;
-  // _backlightValue = LCD_BACKLIGHT_ON;
+
    _initialized = true;
    return _initialized;
 }
 
 
-void VirtLiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS)
+void VirtLiquidCrystal::begin()
 {  
+   if (!_initialized)
+   {
+      return;
+   }
    
    // for some 1 line displays you can select a 10 pixel high font
    // ------------------------------------------------------------
@@ -189,15 +192,14 @@ void LCDi2c::display(lcd_mode_t mode)
 	}
 
 
-void VirtLiquidCrystal::display()
-{
-   _displaycontrol |= LCD_DISPLAY_ON;
-   command(LCD_DISPLAY_CONTROL | _displaycontrol);
-}
-
 void VirtLiquidCrystal::noDisplay()
 {
    _displaycontrol &= ~LCD_DISPLAY_ON;
+   command(LCD_DISPLAY_CONTROL | _displaycontrol);
+}
+void VirtLiquidCrystal::display()
+{
+   _displaycontrol |= LCD_DISPLAY_ON;
    command(LCD_DISPLAY_CONTROL | _displaycontrol);
 }
 
@@ -233,7 +235,7 @@ void VirtLiquidCrystal::scrollDisplayLeft(void) //moveCursorLeft
 
 void VirtLiquidCrystal::scrollDisplayRight(void)
 {
-   command(LCD_CURSOR_SHIFT | LCD_CURSOR_MOVE | LCD_MOVE_RIGHT);
+   command(LCD_CURSOR_SHIFT | LCD_DISPLAY_MOVE | LCD_MOVE_RIGHT);
 }
 void VirtLiquidCrystal::leftToRight(void)
 {
@@ -244,6 +246,18 @@ void VirtLiquidCrystal::rightToLeft(void)
 {
    _displaymode &= ~LCD_ENTRY_LEFT;
    command(LCD_ENTRY_MODE_SET | _displaymode);
+}
+
+// This method moves the cursor one space to the right
+void VirtLiquidCrystal::moveCursorRight(void)
+{
+   command(LCD_CURSOR_SHIFT | LCD_CURSOR_MOVE | LCD_MOVE_RIGHT);
+}
+
+// This method moves the cursor one space to the left
+void VirtLiquidCrystal::moveCursorLeft(void)
+{
+   command(LCD_CURSOR_SHIFT | LCD_CURSOR_MOVE | LCD_MOVE_LEFT);
 }
 
 void VirtLiquidCrystal::autoscroll(void)
@@ -304,6 +318,8 @@ void VirtLiquidCrystal::backlight(void)
    default:
       return;
    }
+
+   // setBacklight(255);
 }
 
 //
@@ -322,6 +338,8 @@ void VirtLiquidCrystal::noBacklight(void)
    default:
       return;
    }
+
+   //setBacklight(0);
 }
 
 //
@@ -351,12 +369,12 @@ void VirtLiquidCrystal::command(uint8_t value)
 #if (ARDUINO < 100)
 void VirtLiquidCrystal::write(uint8_t value)
 {
-   send(value, DATA);
+   send(value, LCD_DATA);
 }
 #else
 size_t VirtLiquidCrystal::write(uint8_t value)
 {
-   send(value, DATA);
+   send(value, LCD_DATA);
    return 1; // assume OK
 }
 #endif

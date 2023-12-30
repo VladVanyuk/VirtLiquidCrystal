@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #endif
 #include <inttypes.h>
-#include "I2CIO.h"
+#include "I2C_IO.h"
 #include "LiquidCrystal_I2C.h"
 
 // CONSTANT  definitions
@@ -17,13 +17,13 @@
 
 
 
-#define EN 6  // Enable bit
-#define RW 5  // Read/Write bit
-#define RS 4  // Register select bit
-#define D4 0
-#define D5 1
-#define D6 2
-#define D7 3
+#define LCD_EN 6  // Enable bit
+#define LCD_RW 5  // Read/Write bit
+#define LCD_RS 4  // Register select bit
+#define LCD_D4 0
+#define LCD_D5 1
+#define LCD_D6 2
+#define LCD_D7 3
 
 
 // CONSTRUCTORS

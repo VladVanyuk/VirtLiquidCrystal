@@ -21,7 +21,7 @@
 // Thread Safe: No
 // Extendable: Yes
 //
-// @file I2CIO.h
+// @file I2C_IO.h
 // This file implements a basic IO library using the PCF8574 I2C IO Expander
 // chip.
 //
@@ -58,7 +58,7 @@
 
 #include <inttypes.h>
 
-#include "I2CIO.h"
+#include "I2C_IO.h"
 
 
 
@@ -68,7 +68,7 @@
 
 // CONSTRUCTOR
 // ---------------------------------------------------------------------------
-I2CIO::I2CIO ( )
+I2C_IO::I2C_IO ( )
 {
    _i2cAddr     = 0x0;
    _dirMask     = 0xFF;    // mark all as INPUTs
@@ -82,7 +82,7 @@ I2CIO::I2CIO ( )
 
 //
 // begin
-int I2CIO::begin (  uint8_t i2cAddr )
+int I2C_IO::begin (  uint8_t i2cAddr )
 {
    _i2cAddr = i2cAddr;
 
@@ -103,7 +103,7 @@ int I2CIO::begin (  uint8_t i2cAddr )
 
 //
 // pinMode
-void I2CIO::pinMode ( uint8_t pin, uint8_t dir )
+void I2C_IO::pinMode ( uint8_t pin, uint8_t dir )
 {
    if ( _initialised )
    {
@@ -120,7 +120,7 @@ void I2CIO::pinMode ( uint8_t pin, uint8_t dir )
 
 //
 // portMode
-void I2CIO::portMode ( uint8_t dir )
+void I2C_IO::portMode ( uint8_t dir )
 {
 
    if ( _initialised )
@@ -138,7 +138,7 @@ void I2CIO::portMode ( uint8_t dir )
 
 //
 // read
-uint8_t I2CIO::read ( void )
+uint8_t I2C_IO::read ( void )
 {
    uint8_t retVal = 0;
 
@@ -157,7 +157,7 @@ uint8_t I2CIO::read ( void )
 
 //
 // write
-int I2CIO::write ( uint8_t value )
+int I2C_IO::write ( uint8_t value )
 {
    int status = 0;
 
@@ -184,7 +184,7 @@ int I2CIO::write ( uint8_t value )
 
 //
 // digitalRead
-uint8_t I2CIO::digitalRead ( uint8_t pin )
+uint8_t I2C_IO::digitalRead ( uint8_t pin )
 {
    uint8_t pinVal = 0;
 
@@ -201,7 +201,7 @@ uint8_t I2CIO::digitalRead ( uint8_t pin )
 
 //
 // digitalWrite
-int I2CIO::digitalWrite ( uint8_t pin, uint8_t level )
+int I2C_IO::digitalWrite ( uint8_t pin, uint8_t level )
 {
    uint8_t writeVal;
    int status = 0;
@@ -231,7 +231,7 @@ int I2CIO::digitalWrite ( uint8_t pin, uint8_t level )
 //
 // PRIVATE METHODS
 // ---------------------------------------------------------------------------
-bool I2CIO::isAvailable (uint8_t i2cAddr)
+bool I2C_IO::isAvailable (uint8_t i2cAddr)
 {
    int error;
 

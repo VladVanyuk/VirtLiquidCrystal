@@ -120,7 +120,7 @@ inline static void waitUsec(uint16_t uSec)
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
-// Define COMMAND and DATA LCD Rs (used by send method).
+// Define COMMAND and LCD_DATA LCD Rs (used by send method).
 // ---------------------------------------------------------------------------
 #define COMMAND 0
 #define LCD_DATA 1

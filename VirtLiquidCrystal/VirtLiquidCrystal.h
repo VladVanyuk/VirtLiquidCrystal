@@ -56,12 +56,6 @@
 #define LCD_BLINK_ON 0x01
 #define LCD_BLINK_OFF 0x00
 
-/** @defgroup flags for backlight control
- *  Flags for controlling the backlight of the display
- */
-#define LCD_BACKLIGHT_ON 0x08
-#define LCD_BACKLIGHT_OFF 0x00 // flags for backlight control
-
 /** @defgroup flags for display/cursor shift
  *  Flags for shifting the display or cursor
  */
@@ -80,11 +74,17 @@
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
-/** @defgroup Define COMMAND and DATA LCD Rs (used by send method).
+/** @defgroup flags for backlight control
+ *  Flags for controlling the backlight of the display
+ */
+#define LCD_BACKLIGHT_ON 0x08
+#define LCD_BACKLIGHT_OFF 0x00 // flags for backlight control
+
+/** @defgroup Define COMMAND and LCD_DATA LCD Rs (used by send method).
  *  Constants for distinguishing between commands and data sent to the LCD
  */
 #define COMMAND 0
-#define DATA 1
+#define LCD_DATA 1
 #define FOUR_BITS 2
 
 /** @defined
@@ -122,7 +122,7 @@ class VirtLiquidCrystal : public Print
 public:
   uint8_t init(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
 
-  void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
+  void begin();
 
   /** @brief Clear the display */
   void clear();
@@ -169,16 +169,19 @@ public:
   void cursor();
 
   /** @brief Scroll the display left */
-  void scrollDisplayLeft();
+  void scrollDisplayLeft(); 
 
   /** @brief Scroll the display right */
-  void scrollDisplayRight();
+  void scrollDisplayRight(); 
 
   /** @brief Set the text direction to left-to-right */
   void leftToRight();
 
   /** @brief Set the text direction to right-to-left */
   void rightToLeft();
+
+  void moveCursorRight();
+  void moveCursorLeft();
 
   /** @brief Turn on autoscrolling */
   void autoscroll();
@@ -219,7 +222,6 @@ public:
   //& Virtual class methods --------------------------------------------------------------------------
 
   
-
 #if (ARDUINO < 100)
   virtual void write(uint8_t value);
   virtual void setBacklightPin(uint8_t value, t_backlighPol pol = POSITIVE){};
@@ -259,13 +261,9 @@ private:
 
 #if (ARDUINO < 100)
   virtual void send(uint8_t value, uint8_t mode){};
-  virtual void write4bits(uint8_t){};
-  virtual void write8bits(uint8_t){};
   virtual void pulseEnable(void){};
 #else
   virtual void send(uint8_t value, uint8_t mode) = 0;
-  virtual void write4bits(uint8_t) = 0;
-  virtual void write8bits(uint8_t) = 0;
   virtual void pulseEnable(void) = 0;
 #endif
 };

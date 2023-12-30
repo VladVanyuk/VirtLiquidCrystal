@@ -1,29 +1,3 @@
-// ---------------------------------------------------------------------------
-// Created by Francisco Malpartida on 20/08/11.
-// Copyright 2011 - Under creative commons license 3.0:
-//        Attribution-ShareAlike CC BY-SA
-//
-// This software is furnished "as is", without technical support, and with no
-// warranty, express or implied, as to its usefulness for any purpose.
-//
-// Thread Safe: No
-// Extendable: Yes
-//
-// @file I2CIO.h
-// This file implements a basic IO library using the PCF8574 I2C IO Expander
-// chip.
-//
-// @brief
-// Implement a basic IO library to drive the PCF8574* I2C IO Expander ASIC.
-// The library implements basic IO general methods to configure IO pin direction
-// read and write uint8_t operations and basic pin level routines to set or read
-// a particular IO port.
-//
-//
-// @version API 1.0.0
-//
-// @author F. Malpartida - fmalpartida@gmail.com
-// ---------------------------------------------------------------------------
 
 #if (ARDUINO < 100)
 #include <WProgram.h>
@@ -39,34 +13,24 @@
 
 #include <inttypes.h>
 
-#include "I2CIO.h"
+#include "I2C_IO.h"
 
 
-// CLASS VARIABLES
-// ---------------------------------------------------------------------------
-
-// CONSTRUCTOR
-// ---------------------------------------------------------------------------
-I2CIO::I2CIO(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_NO_MASK, uint8_t pinShadow = I2C_NO_SHADOW)
+I2C_IO::I2C_IO(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_MASK_INPUT, uint8_t pinShadow = I2C_NO_SHADOW)
 {
    init(i2cAddr, dirMask, pinShadow);
 }
 
-// PUBLIC METHODS
-// ---------------------------------------------------------------------------
-uint8_t I2CIO::init(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_NO_MASK, uint8_t pinShadow = I2C_NO_SHADOW)
+uint8_t I2C_IO::init(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_MASK_INPUT, uint8_t pinShadow = I2C_NO_SHADOW)
 {
+   _i2cAddr = i2cAddr;
+   _dirMask = dirMask;
+   _pinShadow = pinShadow; 
    _initialised = isAvailable(_i2cAddr);
-   if (!_initialised)
-   {
-      _i2cAddr = i2cAddr;
-      _dirMask = dirMask; // mark all as INPUTs
-      _pinShadow = pinShadow;   // no values set
-   }
    return _initialised;
 }
 
-uint8_t I2CIO::begin()
+uint8_t I2C_IO::begin()
 {
    Wire.begin();
 
@@ -79,12 +43,15 @@ uint8_t I2CIO::begin()
 #else
       _pinShadow = Wire.read(); // Remove the byte read don't need it.
 #endif
+   
+      portMode ( OUTPUT );
+      write(LOW);
    }
    return (_initialised);
 }
 
 
-void I2CIO::pinMode(uint8_t pin, uint8_t dir)
+void I2C_IO::pinMode(uint8_t pin, uint8_t dir)
 {
    if (_initialised)
    {
@@ -100,7 +67,7 @@ void I2CIO::pinMode(uint8_t pin, uint8_t dir)
 }
 
 
-void I2CIO::portMode(uint8_t dir)
+void I2C_IO::portMode(uint8_t dir)
 {
 
    if (_initialised)
@@ -117,7 +84,7 @@ void I2CIO::portMode(uint8_t dir)
 }
 
 
-uint8_t I2CIO::read(void)
+uint8_t I2C_IO::read(void)
 {
    uint8_t retVal = 0;
 
@@ -134,7 +101,7 @@ uint8_t I2CIO::read(void)
 }
 
 
-uint8_t I2CIO::write(uint8_t value)
+uint8_t I2C_IO::write(uint8_t value)
 {
    uint8_t status = 0;
 
@@ -142,7 +109,7 @@ uint8_t I2CIO::write(uint8_t value)
    {
       // Only write HIGH the values of the ports that have been initialised as
       // outputs updating the output shadow of the device
-      _pinShadow = (value & ~(_dirMask));
+      _pinShadow = (value & ~(_dirMask)); //_shadow = ( value | _dirMask );
 
       Wire.beginTransmission(_i2cAddr);
 #if (ARDUINO < 100)
@@ -156,7 +123,7 @@ uint8_t I2CIO::write(uint8_t value)
 }
 
 
-uint8_t I2CIO::digitalRead(uint8_t pin)
+uint8_t I2C_IO::digitalRead(uint8_t pin)
 {
    uint8_t pinVal = 0;
 
@@ -172,7 +139,7 @@ uint8_t I2CIO::digitalRead(uint8_t pin)
 }
 
 
-uint8_t I2CIO::digitalWrite(uint8_t pin, uint8_t level)
+uint8_t I2C_IO::digitalWrite(uint8_t pin, uint8_t level)
 {
    uint8_t writeVal;
    uint8_t status = 0;
@@ -200,13 +167,13 @@ uint8_t I2CIO::digitalWrite(uint8_t pin, uint8_t level)
 //
 // PRIVATE METHODS
 // ---------------------------------------------------------------------------
-bool I2CIO::isAvailable(uint8_t i2cAddr)
+bool I2C_IO::isAvailable(uint8_t i2cAddr)
 {
    int ret;
 
    Wire.beginTransmission(i2cAddr);
    ret = Wire.endTransmission();
 
-   return (ret == 0) ? true : false;
+   return (ret == 0) ? true : false; //false if err
    
 }

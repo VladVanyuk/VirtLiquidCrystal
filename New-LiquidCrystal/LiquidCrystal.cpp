@@ -133,7 +133,7 @@ LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t enable,
 // send
 void LiquidCrystal::send(uint8_t value, uint8_t mode) 
 {
-   // Only interested in COMMAND or DATA
+   // Only interested in COMMAND or LCD_DATA
    digitalWrite( _rs_pin, ( mode == LCD_DATA ) );
    
    // if there is a RW pin indicated, set it low to Write
