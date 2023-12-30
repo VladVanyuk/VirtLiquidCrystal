@@ -42,7 +42,7 @@ void LiquidCrystal_I2C::begin()
   }
 
 
-  _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+  _displayfunction = LCD_4BIT_MODE | LCD_1_LINE | LCD_5x8DOTS;
 
  
 
@@ -81,20 +81,20 @@ void LiquidCrystal_I2C::begin()
   write4bits(0x02 << 4);
 
   // set # lines, font size, etc.
-  command(LCD_FUNCTIONSET | _displayfunction);
+  command(LCD_FUNCTION_SET | _displayfunction);
 
   // turn the display on with no cursor or blinking default
-  _displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
+  _displaycontrol = LCD_DISPLAY_ON | LCD_CURSOR_OFF | LCD_BLINK_OFF;
   display();
 
   // clear it off
   clear();
 
   // Initialize to default text direction (for roman languages)
-  _displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
+  _displaymode = LCD_ENTRY_LEFT | LCD_ENTRY_SHIFT_DECREMENT;
 
   // set the entry mode
-  command(LCD_ENTRYMODESET | _displaymode);
+  command(LCD_ENTRY_MODE_SET | _displaymode);
 
   home();
 }

@@ -20,9 +20,6 @@
 #include <inttypes.h>
 #include <Print.h>
 
-#ifndef _BV
-#define _BV(bit) (1 << (bit))
-#endif
 
 #ifdef __AVR__
 #define FAST_MODE
@@ -32,33 +29,32 @@
  *  @brief LCD command definitions shouldn't be used unless you are writing a driver.
  *  @note All these definitions are for driver implementation only and shouldn't be used by applications.
  */
-#define LCD_CLEARDISPLAY 0x01   // (1<<0)
-#define LCD_RETURNHOME 0x02     // (1<<1)
-#define LCD_ENTRYMODESET 0x04   // (1<<2)
-#define LCD_DISPLAYCONTROL 0x08 // (1<<3)
-#define LCD_CURSORSHIFT 0x10    // (1<<4)
-#define LCD_FUNCTIONSET 0x20    // (1<<5)
-#define LCD_SETCGRAMADDR 0x40   // (1<<6)
-#define LCD_SETDDRAMADDR 0x80   // (1<<7)
+#define LCD_CLEAR_DISPLAY 0x01   // (1<<0)
+#define LCD_RETURN_HOME 0x02     // (1<<1)
+#define LCD_ENTRY_MODE_SET 0x04  // (1<<2)
+#define LCD_DISPLAY_CONTROL 0x08 // (1<<3)
+#define LCD_CURSOR_SHIFT 0x10    // (1<<4)
+#define LCD_FUNCTION_SET 0x20    // (1<<5)
+#define LCD_SET_CGRAM_ADDR 0x40  // (1<<6)
+#define LCD_SET_DDRAM_ADDR 0x80  // (1<<7)
 
 /** @defgroup flags for display entry mode
  *  Flags for setting the text entry mode
  */
-#define LCD_ENTRYRIGHT 0x00
-#define LCD_ENTRYLEFT 0x02
-
-#define LCD_ENTRYSHIFTINCREMENT 0x01
-#define LCD_ENTRYSHIFTDECREMENT 0x00
+#define LCD_ENTRY_RIGHT 0x00
+#define LCD_ENTRY_LEFT 0x02
+#define LCD_ENTRY_SHIFT_INCREMENT 0x01
+#define LCD_ENTRY_SHIFT_DECREMENT 0x00
 
 /** @defgroup flags for display on/off and blink control
  *  Flags for turning the display on/off and controlling the blink and cursor
  */
-#define LCD_DISPLAYON 0x04
-#define LCD_DISPLAYOFF 0x00
-#define LCD_CURSORON 0x02
-#define LCD_CURSOROFF 0x00
-#define LCD_BLINKON 0x01
-#define LCD_BLINKOFF 0x00
+#define LCD_DISPLAY_ON 0x04
+#define LCD_DISPLAY_OFF 0x00
+#define LCD_CURSOR_ON 0x02
+#define LCD_CURSOR_OFF 0x00
+#define LCD_BLINK_ON 0x01
+#define LCD_BLINK_OFF 0x00
 
 /** @defgroup flags for backlight control
  *  Flags for controlling the backlight of the display
@@ -69,18 +65,18 @@
 /** @defgroup flags for display/cursor shift
  *  Flags for shifting the display or cursor
  */
-#define LCD_DISPLAYMOVE 0x08
-#define LCD_CURSORMOVE 0x00
-#define LCD_MOVERIGHT 0x04
-#define LCD_MOVELEFT 0x00
+#define LCD_DISPLAY_MOVE 0x08
+#define LCD_CURSOR_MOVE 0x00
+#define LCD_MOVE_RIGHT 0x04
+#define LCD_MOVE_LEFT 0x00
 
 /** @defgroup flags for function set
  *  Flags for setting the function of the display
  */
-#define LCD_8BITMODE 0x10
-#define LCD_4BITMODE 0x00
-#define LCD_2LINE 0x08
-#define LCD_1LINE 0x00
+#define LCD_8BIT_MODE 0x10
+#define LCD_4BIT_MODE 0x00
+#define LCD_2_LINE 0x08
+#define LCD_1_LINE 0x00
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
@@ -103,6 +99,24 @@ typedef enum
   NEGATIVE
 } t_backlighPol;
 
+typedef enum
+{
+  DISPLAY_ON,
+  DISPLAY_OFF,
+  CURSOR_ON,
+  CURSOR_OFF,
+  BLINK_ON,
+  BLINK_OFF,
+  SCROLL_LEFT,
+  SCROLL_RIGHT,
+  LEFT_TO_RIGHT,
+  RIGHT_TO_LEFT,
+  AUTOSCROLL_ON,
+  AUTOSCROLL_OFF,
+  BACKLIGHT_ON,
+  BACKLIGHT_OFF,
+} lcd_mode_t;
+
 class VirtLiquidCrystal : public Print
 {
 public:
@@ -121,6 +135,26 @@ public:
 
   /** @brief Turn on the display */
   void display();
+
+  /**
+   * @brief set display modes
+   *
+   * @param mode
+   * - DISPLAY_ON Turn the display on
+   * - DISPLAY_OFF Turn the display off
+   * - CURSOR_ON Turns the underline cursor on
+   * - CURSOR_OFF Turns the underline cursor off
+   * - BLINK_ON Turn the blinking cursor on
+   * - BLINK_OFF Turn the blinking cursor off
+   * - SCROLL_LEFT These command scroll the display without changing the RAM
+   * - SCROLL_RIGHT These commands scroll the display without changing the RAM
+   * - LEFT_TO_RIGHT This is for text that flows Left to Right
+   * - RIGHT_TO_LEFT This is for text that flows Right to Left
+   * - AUTOSCROLL_ON This will 'right justify' text from the cursor
+   * - AUTOSCROLL_OFF This will 'left justify' text from the cursor
+   *
+   */
+  void display(lcd_mode_t mode);
 
   /** @brief Turn off the blink */
   void noBlink();
@@ -184,35 +218,26 @@ public:
 
   //& Virtual class methods --------------------------------------------------------------------------
 
-  /** @brief Set the polarity of the backlight
-   *
-   *  @param value Value of the backlight polarity
-   *  @param pol Polarity of the backlight
-   */
-  virtual void setBacklightPin(uint8_t value, t_backlighPol pol = POSITIVE) = 0;
-
-  /** @brief Set the value of the backlight
-   *
-   *  @param new_val New value of the backlight
-   */
-  virtual void setBacklight(uint8_t new_val) = 0;
+  
 
 #if (ARDUINO < 100)
   virtual void write(uint8_t value);
+  virtual void setBacklightPin(uint8_t value, t_backlighPol pol = POSITIVE){};
+  virtual void setBacklight(uint8_t new_val){};
 #else
   virtual size_t write(uint8_t value);
+  virtual void setBacklightPin(uint8_t value, t_backlighPol pol = POSITIVE) = 0;
+  virtual void setBacklight(uint8_t new_val) = 0;
 #endif
   using Print::write;
 
+  //   //& Internal LCD variables to control the LCD shared between all derived classes. --------------------------------------------------------------------------
 
-//   //& Internal LCD variables to control the LCD shared between all derived classes. --------------------------------------------------------------------------
-
-  uint8_t _displayfunction; // LCD_5x10DOTS or LCD_5x8DOTS, LCD_4BITMODE or LCD_8BITMODE, LCD_1LINE or LCD_2LINE
+  uint8_t _displayfunction; // LCD_5x10DOTS or LCD_5x8DOTS, LCD_4BIT_MODE or LCD_8BIT_MODE, LCD_1_LINE or LCD_2_LINE
   uint8_t _displaycontrol;  // LCD base control command LCD on/off, blink, cursor all commands are "ored" to its contents.
   uint8_t _displaymode;     // Text entry mode to the LCD
 
   uint8_t _charsize;
-  
 
   uint8_t _rows;
   uint8_t _cols;
@@ -220,8 +245,8 @@ public:
   t_backlighPol _polarity;
   uint8_t _backlightValue;
 
-  protected:
-    uint8_t _initialized;
+protected:
+  uint8_t _initialized;
 
   //& PRIVATE--------------------------------------------------------------------------
 

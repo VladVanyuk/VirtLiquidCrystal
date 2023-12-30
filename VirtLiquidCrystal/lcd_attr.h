@@ -20,6 +20,28 @@ enum DisplayCommands
     SET_DDATA_MASK = 0x7f      // Mask (7 bit, 0..79 => 1..80).
 };
 
+/*
+enum DisplayCommandsB
+{
+    CLEAR_DISPLAY =     0b00000001,      // Clears entire display and return home.
+    RETURN_HOME =       0b00000010,        // Sets DDRAM 0 in address counter.
+    ENTRY_MODE_SET =    0b00000100,     // Sets cursor move direction and display shift.
+    CONTROL_SET =       0b00001000,        // Set display, cursor and blinking controls.
+    SHIFT_SET =         0b00010000,          // Set cursor and shifts display.
+    FUNCTION_SET =      0b00100000,       // Sets interface data length, line and font.
+    SET_CGRAM_ADDR =    0b01000000,     // Sets CGRAM address.
+    SET_CGRAM_MASK =    0b00111111,     // Mask (6-bit).
+    SET_DDRAM_ADDR =    0b10000000,     // Sets DDRAM address.
+    SET_DDRAM_MASK =    0b01111111,     // Mask (7-bit).
+    BIAS_RESISTOR_SET = 0b00000100,  // Bias resistor select.
+    BIAS_RESISTOR_MASK= 0b00000011, // Mask (2-bit).
+    COM_SEG_SET =       0b01000000,        // COM SEG direction select.
+    COM_SET_MASK =      0b00001111,       // Mask (4 bit).
+    SET_DDATA_LENGTH =  0b10000000,   // Set display data length.
+    SET_DDATA_MASK =    0b01111111      // Mask (7 bit, 0..79 => 1..80).
+};*/
+
+
 enum EntryModeSetAttributes
 {
     DISPLAY_SHIFT = 0x01, // Shift the entire display not cursor.

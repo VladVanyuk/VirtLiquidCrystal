@@ -68,9 +68,9 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
     _data_pins[7] = d7;
 
     if (fourbitmode)
-        _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+        _displayfunction = LCD_4BIT_MODE | LCD_1_LINE | LCD_5x8DOTS;
     else
-        _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
+        _displayfunction = LCD_8BIT_MODE | LCD_1_LINE | LCD_5x8DOTS;
 
     //  begin(16, 1);    // Shouldn't call begin from constructor
 }
@@ -87,7 +87,7 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x
     pinMode(_enable_pin, OUTPUT);
 
     // Do these once, instead of every time a character is drawn for speed reasons.
-    for (int i = 0; i < ((_displayfunction & LCD_8BITMODE) ? 8 : 4); ++i)
+    for (int i = 0; i < ((_displayfunction & LCD_8BIT_MODE) ? 8 : 4); ++i)
     {
         pinMode(_data_pins[i], OUTPUT);
     }
@@ -122,7 +122,7 @@ void LiquidCrystal::send(uint8_t value, uint8_t mode)
         digitalWrite(_rw_pin, LOW);
     }
 
-    if (_displayfunction & LCD_8BITMODE)
+    if (_displayfunction & LCD_8BIT_MODE)
     {
         write8bits(value);
     }
