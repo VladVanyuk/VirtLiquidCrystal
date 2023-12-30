@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include "VirtLiquidCrystal.h"
 
-class LiquidCrystal : public VirtLiquidCrystal {
+class LiquidCrystal : public VirtLiquidCrystal{
 public:
   LiquidCrystal(uint8_t rs, uint8_t enable,
 		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
@@ -24,7 +24,7 @@ public:
   void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
 
   
-  using Print::write;
+  //using Print::write;
 private:
   void send(uint8_t, uint8_t);
   void write4bits(uint8_t);

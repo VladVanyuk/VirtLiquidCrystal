@@ -14,96 +14,77 @@
 
 // PUBLIC METHODS
 // ---------------------------------------------------------------------------
-// When the display powers up, it is configured as follows:
-// 0. LCD starts in 8 bit mode
-// 1. Display clear
-// 2. Function set:
-//    DL = 1; 8-bit interface data
-//    N = 0; 1-line display
-//    F = 0; 5x8 dot character font
-// 3. Display on/off control:
-//    D = 0; Display off
-//    C = 0; Cursor off
-//    B = 0; Blinking off
-// 4. Entry mode set:
-//    I/D = 1; Increment by 1
-//    S = 0; No shift
-//
-// Note, however, that resetting the Arduino doesn't reset the LCD, so we
-// can't assume that its in that state when a application starts (and the
-// LiquidCrystal constructor is called).
-// A call to begin() will reinitialize the LCD.
-//
-void VirtLiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
+uint8_t VirtLiquidCrystal::init(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS)
 {
    if (lines > 1)
    {
       _displayfunction |= LCD_2LINE;
    }
-   _numlines = lines;
-   _cols = cols;
 
+   _cols = cols;
+   _rows = lines;
+   _charsize = charsize;
+  // _polarity = POSITIVE;
+  // _backlightValue = LCD_BACKLIGHT_ON;
+   _initialized = true;
+   return _initialized;
+}
+
+
+void VirtLiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS)
+{  
+   
    // for some 1 line displays you can select a 10 pixel high font
    // ------------------------------------------------------------
-   if ((dotsize != LCD_5x8DOTS) && (lines == 1))
+   if ((_charsize != LCD_5x8DOTS) && (_rows == 1))
    {
       _displayfunction |= LCD_5x10DOTS;
    }
 
-   // SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
-   // according to datasheet, we need at least 40ms after power rises above 2.7V
-   // before sending commands. Arduino can turn on way before 4.5V so we'll wait
-   // 50
+
    // ---------------------------------------------------------------------------
    // delay (100); // 100ms delay
-   setDelay(100000);
+   waitMicroseconds(100000);
 
    // put the LCD into 4 bit or 8 bit mode
    //  -------------------------------------
 
    if (!(_displayfunction & LCD_8BITMODE))
    {
-      // this is according to the hitachi HD44780 datasheet
-      // figure 24, pg 46
-
-      // we start in 8bit mode, try to set 4 bit mode
-      // Special case of "Function Set"
+    
       send(0x03, FOUR_BITS);
-      setDelay(4500); // wait min 4.1ms
+      waitMicroseconds(4500); // wait min 4.1ms
 
       // second try
       send(0x03, FOUR_BITS);
-      setDelay(150); // wait min 100us
+      waitMicroseconds(150); // waitMicroseconds min 100us
 
       // third go!
       send(0x03, FOUR_BITS);
-      setDelay(150); // wait min of 100us
+      waitMicroseconds(150); // waitMicroseconds min of 100us
 
       // finally, set to 4-bit interface
       send(0x02, FOUR_BITS);
-      setDelay(150); // wait min of 100us
+      waitMicroseconds(150); // waitMicroseconds min of 100us
    }
    else
    {
-      // this is according to the hitachi HD44780 datasheet
-      // page 45 figure 23
-
       // Send function set command sequence
       command(LCD_FUNCTIONSET | _displayfunction);
-      setDelay(4500); // wait more than 4.1ms
+      waitMicroseconds(4500); // waitMicroseconds more than 4.1ms
 
       // second try
       command(LCD_FUNCTIONSET | _displayfunction);
-      setDelay(150);
+      waitMicroseconds(150);
 
       // third go
       command(LCD_FUNCTIONSET | _displayfunction);
-      setDelay(150);
+      waitMicroseconds(150);
    }
 
    // finally, set # lines, font size, etc.
    command(LCD_FUNCTIONSET | _displayfunction);
-   setDelay(60); // wait more
+   waitMicroseconds(60); // waitMicroseconds more
 
    // turn the display on with no cursor or blinking default
    _displaycontrol = LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF;
@@ -136,7 +117,7 @@ void VirtLiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
 void VirtLiquidCrystal::clear()
 {
    command(LCD_CLEARDISPLAY); // clear display, set cursor position to zero
-   setDelay(HOME_CLEAR_EXEC); // this command is time consuming
+   waitMicroseconds(HOME_CLEAR_EXEC); // this command is time consuming
 }
 
  /*!
@@ -153,7 +134,7 @@ void VirtLiquidCrystal::clear()
 void VirtLiquidCrystal::home()
 {
    command(LCD_RETURNHOME);   // set cursor position to zero
-   setDelay(HOME_CLEAR_EXEC); // This command is time consuming
+   waitMicroseconds(HOME_CLEAR_EXEC); // This command is time consuming
 }
 
 /*!
@@ -169,14 +150,14 @@ void VirtLiquidCrystal::setCursor(uint8_t col, uint8_t row)
 {
 
    // const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets); // uint8_t _row_offsets[4];
-   if (row >= _numlines)
+   if (row >= _rows)
    {
-      row = _numlines - 1; // rows start at 0
+      row = _rows - 1; // rows start at 0
    }
 
    // 16x4 LCDs have special memory map layout
    // ----------------------------------------
-   if (_cols == 16 && _numlines == 4)
+   if (_cols == 16 && _rows == 4)
    {
       const byte row_offsetsLarge[] = {0x00, 0x40, 0x10, 0x50}; // For 16x4 LCDs
       command(LCD_SETDDRAMADDR | (col + row_offsetsLarge[row]));
@@ -353,19 +334,6 @@ void VirtLiquidCrystal::moveCursorLeft(void)
 }
 
 // This will 'right justify' text from the cursor
-/*!
-    @function
-    @abstract   Turns on automatic scrolling of the LCD.
-    @discussion Turns on automatic scrolling of the LCD. This causes each
-    character output to the display to push previous characters over by one
-    space. If the current text direction is left-to-right (the default),
-    the display scrolls to the left; if the current direction is right-to-left,
-    the display scrolls to the right.
-    This has the effect of outputting each new character to the same location on
-    the LCD.
-
-    @param      none
-    */
 void VirtLiquidCrystal::autoscroll(void)
 {
    _displaymode |= LCD_ENTRYSHIFTINCREMENT;
@@ -373,14 +341,6 @@ void VirtLiquidCrystal::autoscroll(void)
 }
 
 // This will 'left justify' text from the cursor
-/*!
-    @function
-    @abstract   Turns off automatic scrolling of the LCD.
-    @discussion Turns off automatic scrolling of the LCD, this is the default
-    configuration of the LCD.
-
-    @param      none
-    */
 void VirtLiquidCrystal::noAutoscroll(void)
 {
    _displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
@@ -388,81 +348,36 @@ void VirtLiquidCrystal::noAutoscroll(void)
 }
 
 // Write to CGRAM of new characters
-/*!
-    @function
-    @abstract   Creates a custom character for use on the LCD.
-    @discussion Create a custom character (glyph) for use on the LCD.
-    Most chipsets only support up to eight characters of 5x8 pixels. Therefore,
-    this methods has been limited to locations (numbered 0 to 7).
-
-    The appearance of each custom character is specified by an array of eight
-    bytes, one for each row. The five least significant bits of each byte
-    determine the pixels in that row. To display a custom character on screen,
-    write()/print() its number, i.e. lcd.print (char(x)); // Where x is 0..7.
-
-    @param      location[in] LCD memory location of the character to create
-    (0 to 7)
-    @param      charmap[in] the bitmap array representing each row of the character.
-    */
 void VirtLiquidCrystal::createChar(uint8_t location, uint8_t charmap[])
 {
    location &= 0x7; // we only have 8 locations 0-7
 
    command(LCD_SETCGRAMADDR | (location << 3));
-   setDelay(30);
+   waitMicroseconds(30);
 
    for (uint8_t i = 0; i < 8; i++)
    {
       write(charmap[i]); // call the virtual write method
-      setDelay(40);
+      waitMicroseconds(40);
    }
 }
 
 #ifdef __AVR__
-/*!
-    @function
-    @abstract   Creates a custom character for use on the LCD.
-    @discussion Create a custom character (glyph) for use on t{he LCD.
-    Most chipsets only support up to eight characters of 5x8 pixels. Therefore,
-    this methods has been limited to locations (numbered 0 to 7).
-
-    The appearance of each custom character is specified by an array of eight
-    bytes, one for each row. The five least significant bits of each byte
-    determine the pixels in that row. To display a custom character on screen,
-    write()/print() its number, i.e. lcd.print (char(x)); // Where x is 0..7.
-
-    This method take the character defined in program memory.
-
-    @param      location[in] LCD memory location of the character to create
-    (0 to 7)
-    @param      charmap[in] the bitmap array representing each row of the character.
-                Usage for flash defined characters:
-                const char str_pstr[] PROGMEM = {0xc, 0x12, 0x12, 0xc, 0, 0, 0, 0};
-    */
 void VirtLiquidCrystal::createChar(uint8_t location, const char *charmap)
 {
    location &= 0x7; // we only have 8 memory locations 0-7
 
    command(LCD_SETCGRAMADDR | (location << 3));
-   setDelay(30);
+   waitMicroseconds(30);
 
    for (uint8_t i = 0; i < 8; i++)
    {
       write(pgm_read_byte_near(charmap++));
-      setDelay(40);
+      waitMicroseconds(40);
    }
 }
 #endif // __AVR__
 
-// void VirtLiquidCrystal::setBacklight(uint8_t new_val){
-// 	if (new_val) {
-// 		backlight();		// turn backlight on
-// 	} else {
-// 		noBacklight();		// turn backlight off
-// 	}
-// }
-
-//
 // Switch on the backlight
 /*!
     @function
@@ -482,6 +397,8 @@ void VirtLiquidCrystal::backlight(void)
    case NEGATIVE:
       _backlightValue = ~LCD_BACKLIGHT_ON;
       break;
+   default:
+      return;
    }
 }
 
@@ -498,6 +415,8 @@ void VirtLiquidCrystal::noBacklight(void)
    case NEGATIVE:
       _backlightValue = ~LCD_BACKLIGHT_OFF;
       break;
+   default:
+      return;
    }
 }
 
@@ -538,7 +457,7 @@ size_t VirtLiquidCrystal::write(uint8_t value)
 }
 #endif
 
-void VirtLiquidCrystal::setDelay(uint8_t cmdDelay)
+void VirtLiquidCrystal::waitMicroseconds(uint8_t cmdDelay)
 {
 #ifdef RTOS
    task_wait(cmdDelay);

@@ -75,10 +75,8 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
     //  begin(16, 1);    // Shouldn't call begin from constructor
 }
 
-void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
+void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS)
 {
-
-    
 
     pinMode(_rs_pin, OUTPUT);
     // we can save 1 pin by not using RW. Indicate by passing 255 instead of pin#
@@ -106,7 +104,7 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
     }
 
     
-    VirtLiquidCrystal::begin(cols, lines, dotsize);
+    VirtLiquidCrystal::begin(cols, lines, charsize);
 
     
 }

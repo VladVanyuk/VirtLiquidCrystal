@@ -3,7 +3,7 @@
 // Copyright 2011 - Under creative commons license 3.0:
 //        Attribution-ShareAlike CC BY-SA
 //
-// This software is furnished "as is", without technical support, and with no 
+// This software is furnished "as is", without technical support, and with no
 // warranty, express or implied, as to its usefulness for any purpose.
 //
 // Thread Safe: No
@@ -12,8 +12,8 @@
 // @file I2CIO.h
 // This file implements a basic IO library using the PCF8574 I2C IO Expander
 // chip.
-// 
-// @brief 
+//
+// @brief
 // Implement a basic IO library to drive the PCF8574* I2C IO Expander ASIC.
 // The library implements basic IO general names to configure IO pin direction
 // read and write uint8_t operations and basic pin level routines to set or read
@@ -27,9 +27,24 @@
 #ifndef _I2CIO_H_
 #define _I2CIO_H_
 
+#if (ARDUINO < 100)
+#include <WProgram.h>
+#else
+#include <Arduino.h>
+#endif
+
+#if (ARDUINO < 10000)
+#include <../Wire/Wire.h>
+#else
+#include <Wire.h>
+#endif
 #include <inttypes.h>
 
-#define _I2CIO_VERSION "1.0.0"
+#define _I2CIO_VERSION "2.0.0"
+
+#define I2C_NO_ADDR 0x0
+#define  I2C_NO_MASK 0xFF
+#define I2C_NO_SHADOW 0x0
 
 /*!
  @class
@@ -38,16 +53,20 @@
  library calls to set/get port through I2C bus.
  */
 
-class I2CIO  
+class I2CIO
 {
 public:
    /*!
-    @name     
+    @name
     @brief   Constructor name
-    @note Class constructor constructor. 
+    @note Class constructor constructor.
     */
-   I2CIO ( );
-   
+   I2CIO(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_NO_MASK, uint8_t pinShadow = I2C_NO_SHADOW);
+
+   ~I2CIO();
+
+   uint8_t init(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_NO_MASK, uint8_t pinShadow = I2C_NO_SHADOW);
+
    /*!
     @name
     @brief   Initializes the device.
@@ -55,23 +74,23 @@ public:
     This name is the first name that should be call prior to calling any
     other name form this class. On initialization all pins are configured
     as INPUT on the device.
-    
+
     @param      i2cAddr: I2C Address where the device is located.
     @result     1 if the device was initialized correctly, 0 otherwise
-    */   
-   int begin ( uint8_t i2cAddr );
-   
+    */
+   uint8_t begin();
+
    /*!
     @name
     @brief   Sets the mode of a particular pin.
     @note Sets the mode of a particular pin to INPUT, OUTPUT. digitalWrite
     has no effect on pins which are not declared as output.
-    
+
     @param      pin[in] Pin from the I2C IO expander to be configured. Range 0..7
     @param      dir[in] Pin direction (INPUT, OUTPUT).
-    */   
-   void pinMode ( uint8_t pin, uint8_t dir );
-   
+    */
+   void pinMode(uint8_t pin, uint8_t dir);
+
    /*!
     @name
     @brief   Sets all the pins of the device in a particular direction.
@@ -80,79 +99,76 @@ public:
     either inputs or outputs.
     @param      dir[in] Direction of all the pins of the device (INPUT, OUTPUT).
     */
-   void portMode ( uint8_t dir );
-   
+   void portMode(uint8_t dir);
+
    /*!
     @name
     @brief   Reads all the pins of the device that are configured as INPUT.
     @note Reads from the device the status of the pins that are configured
     as INPUT. During initialization all pins are configured as INPUTs by default.
     Please refer to pinMode or portMode.
-    
+
     @param      none
-    */   
-   uint8_t read ( void );
-   
+    */
+   uint8_t read(void);
+
    /*!
     @name
     @brief   Read a pin from the device.
     @note Reads a particular pin from the device. To read a particular
     pin it has to be configured as INPUT. During initialization all pins are
     configured as INPUTs by default. Please refer to pinMode or portMode.
-    
+
     @param      pin[in] Pin from the port to read its status. Range (0..7)
     @result     Returns the pin status (HIGH, LOW) if the pin is configured
     as an output, reading its value will always return LOW regardless of its
     real state.
     */
-   uint8_t digitalRead ( uint8_t pin );
-   
+   uint8_t digitalRead(uint8_t pin);
+
    /*!
     @name
     @brief   Write a value to the device.
     @note Writes to a set of pins in the device. The value is the binary
-    representation of all the pins in device. The value written is masked with 
+    representation of all the pins in device. The value written is masked with
     the configuration of the direction of the pins; to change the state of
-    a particular pin with this name, such pin has to be configured as OUTPUT 
+    a particular pin with this name, such pin has to be configured as OUTPUT
     using the portMode or pinMode names. If no pins have been configured as
     OUTPUTs this name will have no effect.
-    
+
     @param      value[in] value to be written to the device.
     @result     1 on success, 0 otherwise
-    */   
-   int write ( uint8_t value );
-   
+    */
+   int write(uint8_t value);
+
    /*!
     @name
     @brief   Writes a digital level to a particular pin.
-    @note Write a level to the indicated pin of the device. For this 
+    @note Write a level to the indicated pin of the device. For this
     name to have effect, the pin has to be configured as OUTPUT using the
     pinMode or portMode names.
-    
+
     @param      pin[in] device pin to change level. Range (0..7).
     @para       level[in] logic level to set the pin at (HIGH, LOW).
     @result     1 on success, 0 otherwise.
-    */   
-   int digitalWrite ( uint8_t pin, uint8_t level );
-   
-   
-   
-private:
-   uint8_t _shadow;      // Shadow output
-   uint8_t _dirMask;     // Direction mask
-   uint8_t _i2cAddr;     // I2C address
-   bool    _initialised; // Initialised object
+    */
+   int digitalWrite(uint8_t pin, uint8_t level);
 
-  /*!
-   @name
-   @brief   Check if I2C device is available.
-   @note Checks to see if an I2C device is available at address i2cAddr.
-   
-   @param      i2cAddr[in] I2C address to check availability 
-   @result     true if available, false otherwise.
-   */   
-   bool isAvailable (uint8_t i2cAddr);
-   
+private:
+   uint8_t _pinShadow;   // Shadow output
+   uint8_t _dirMask;  // Direction mask
+   uint8_t _i2cAddr;  // I2C address
+   bool _initialised; // Initialised object
+
+   /*!
+    @name
+    @brief   Check if I2C device is available.
+    @note Checks to see if an I2C device is available at address i2cAddr.
+
+    @param      i2cAddr[in] I2C address to check availability
+    @result     true if available, false otherwise.
+    */
+   bool isAvailable(uint8_t i2cAddr);
 };
 
 #endif
