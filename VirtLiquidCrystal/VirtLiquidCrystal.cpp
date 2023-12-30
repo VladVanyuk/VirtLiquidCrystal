@@ -319,7 +319,7 @@ void VirtLiquidCrystal::backlight(void)
       return;
    }
 
-   // setBacklight(255);
+   setBacklight(LCD_BACKLIGHT);
 }
 
 //
@@ -339,7 +339,7 @@ void VirtLiquidCrystal::noBacklight(void)
       return;
    }
 
-   //setBacklight(0);
+   setBacklight(LCD_NOBACKLIGHT);
 }
 
 //

@@ -18,7 +18,7 @@ uint8_t LiquidCrystal_I2C::init(uint8_t lcd_addr, uint8_t lcd_cols, uint8_t lcd_
                                 uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
 {
   I2C_IO::init(lcd_addr);
-  _displayfunction = LCD_4BIT_MODE | LCD_1_LINE | LCD_5x8DOTS;
+  _displayfunction = LCD_4BIT_MODE | LCD_1_LINE | charsize; //LCD_5x8DOTS
   VirtLiquidCrystal::init(lcd_cols, lcd_rows, charsize);
 }
 
@@ -137,7 +137,7 @@ void LiquidCrystal_I2C::write4bits(uint8_t value, uint8_t mode)
 void LiquidCrystal_I2C::pulseEnable(uint8_t data)
 {
   I2C_IO::write(data | _En); // En high
-                             // delayMicroseconds(1);     // enable pulse must be >450ns
+  // delayMicroseconds(1);     // enable pulse must be >450ns
 
   I2C_IO::write(data & ~_En); // En low
   // delayMicroseconds(50);     // commands need > 37us to settle

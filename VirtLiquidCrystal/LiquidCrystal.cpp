@@ -24,39 +24,25 @@
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
+LiquidCrystal::LiquidCrystal(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS,
+                             uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
                              uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-                             uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
+                             uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
+                             uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE)
 {
-    init(0, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7);
+    init(cols, lines, charsize, bitmode, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7, backlighPin, pol);
 }
 
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t enable,
-                             uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-                             uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
-{
-    init(0, rs, 255, enable, d0, d1, d2, d3, d4, d5, d6, d7);
-}
-
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-                             uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
-{
-    init(1, rs, rw, enable, d0, d1, d2, d3, 0, 0, 0, 0);
-}
-
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t enable,
-                             uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
-{
-    init(1, rs, 255, enable, d0, d1, d2, d3, 0, 0, 0, 0);
-}
-
-void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
+void LiquidCrystal::init(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS,
+                         uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
                          uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-                         uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
+                         uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
+                         uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE)
 {
-    _rs_pin = rs;
-    _rw_pin = rw;
-    _enable_pin = enable;
+
+    _Rs = rs;
+    _Rw = rw;
+    _En = enable;
 
     _data_pins[0] = d0;
     _data_pins[1] = d1;
@@ -67,24 +53,94 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
     _data_pins[6] = d6;
     _data_pins[7] = d7;
 
-    if (fourbitmode)
-        _displayfunction = LCD_4BIT_MODE | LCD_1_LINE | LCD_5x8DOTS;
-    else
-        _displayfunction = LCD_8BIT_MODE | LCD_1_LINE | LCD_5x8DOTS;
+    _displayfunction = bitmode | LCD_1_LINE | charsize;
 
-    //  begin(16, 1);    // Shouldn't call begin from constructor
+    if (backlighPin)
+    {
+        setBacklightPin(backlighPin, pol);
+    }
+    else
+    {
+        _backlightPin = 0;
+        _polarity = pol;
+    }
+
+    VirtLiquidCrystal::init(cols, lines, charsize);
 }
 
-void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS)
+void LiquidCrystal::setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE)
 {
+    pinMode(pin, OUTPUT); // Difine the backlight pin as output
+    _backlightPin = pin;
+    _polarity = pol;
+    setBacklight(BACKLIGHT_OFF); // Set the backlight low by default
+}
 
-    pinMode(_rs_pin, OUTPUT);
-    // we can save 1 pin by not using RW. Indicate by passing 255 instead of pin#
-    if (_rw_pin != 255)
+// ESP32 complains if not included
+#if defined(ARDUINO_ARCH_ESP32)
+void LiquidCrystal::analogWrite(uint8_t channel, uint32_t value, uint32_t valueMax = UINT8_MAX)
+{
+    // calculate duty, 8191 from 2 ^ 13 - 1
+    uint32_t duty = (8191 / valueMax) * min(value, valueMax);
+
+    // write duty to LEDC
+    ledcWrite(channel, duty);
+}
+#endif
+
+void LiquidCrystal::setBacklight(uint8_t value)
+{
+    // Check if there is a pin assigned to the backlight
+    // ---------------------------------------------------
+    if (_backlightPin != LCD_NOBACKLIGHT)
     {
-        pinMode(_rw_pin, OUTPUT);
+
+#if digitalPinHasPWM
+        if (digitalPinHasPWM(_backlightPin))
+#elif digitalPinToTimer
+        // On older 1.x Arduino have to check using hack
+        if (digitalPinToTimer(_backlightPin) != NOT_ON_TIMER)
+#else
+        if (false) // if neither of the above we assume no PWM
+#endif
+        {
+            // Check for control polarity inversion
+            // ---------------------------------------------------
+            if (_polarity == POSITIVE)
+            {
+
+                analogWrite(_backlightPin, value);
+            }
+            else
+            {
+                analogWrite(_backlightPin, UINT8_MAX - value);
+            }
+        }
+        // Not a PWM pin, set the backlight pin for POSI or NEG
+        // polarity
+        // --------------------------------------------------------
+        else if (((value > 0) && (_polarity == POSITIVE)) ||
+                 ((value == 0) && (_polarity == NEGATIVE)))
+        {
+            digitalWrite(_backlightPin, HIGH);
+        }
+        else
+        {
+            digitalWrite(_backlightPin, LOW);
+        }
     }
-    pinMode(_enable_pin, OUTPUT);
+}
+
+void LiquidCrystal::begin()
+{
+    pinMode(_Rs, OUTPUT);
+    // we can save 1 pin by not using RW. Indicate by passing 255 instead of pin#
+    if (_Rw != UINT8_MAX)
+    {
+        pinMode(_Rw, OUTPUT);
+    }
+
+    pinMode(_En, OUTPUT);
 
     // Do these once, instead of every time a character is drawn for speed reasons.
     for (int i = 0; i < ((_displayfunction & LCD_8BIT_MODE) ? 8 : 4); ++i)
@@ -92,21 +148,17 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x
         pinMode(_data_pins[i], OUTPUT);
     }
 
-    setRowOffsets(cols, lines);
+    // setRowOffsets(cols, lines);
 
-   
     // Now we pull both RS and R/W low to begin commands
-    digitalWrite(_rs_pin, LOW);
-    digitalWrite(_enable_pin, LOW);
-    if (_rw_pin != 255)
+    digitalWrite(_Rs, LOW);
+    digitalWrite(_En, LOW);
+    if (_Rw != UINT8_MAX)
     {
-        digitalWrite(_rw_pin, LOW);
+        digitalWrite(_Rw, LOW);
     }
 
-    
-    VirtLiquidCrystal::begin(cols, lines, charsize);
-
-    
+    VirtLiquidCrystal::begin();
 }
 
 /************ low level data pushing commands **********/
@@ -114,14 +166,19 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x
 // write either command or data, with automatic 4/8-bit selection
 void LiquidCrystal::send(uint8_t value, uint8_t mode)
 {
-    digitalWrite(_rs_pin, mode);
+    digitalWrite(_Rs, (mode == LCD_DATA));
 
     // if there is a RW pin indicated, set it low to Write
-    if (_rw_pin != 255)
+    if (_Rw != UINT8_MAX)
     {
-        digitalWrite(_rw_pin, LOW);
+        digitalWrite(_Rw, LOW);
     }
 
+    write(value);
+}
+
+void LiquidCrystal::write(uint8_t value)
+{
     if (_displayfunction & LCD_8BIT_MODE)
     {
         write8bits(value);
@@ -131,34 +188,38 @@ void LiquidCrystal::send(uint8_t value, uint8_t mode)
         write4bits(value >> 4);
         write4bits(value);
     }
+
+    waitMicroseconds(EXEC_TIME);
 }
 
 void LiquidCrystal::pulseEnable(void)
 {
-    digitalWrite(_enable_pin, LOW);
-    delayMicroseconds(1);
-    digitalWrite(_enable_pin, HIGH);
-    delayMicroseconds(1); // enable pulse must be >450ns
-    digitalWrite(_enable_pin, LOW);
-    delayMicroseconds(100); // commands need > 37us to settle
+    // There is no need for the delays, since the digitalWrite operation
+    // takes longer.
+
+    // digitalWrite(_En, LOW);
+    // waitMicroseconds(1);
+    digitalWrite(_En, HIGH);
+    waitMicroseconds(1); // enable pulse must be >450ns
+    digitalWrite(_En, LOW);
+    // waitMicroseconds(100); // commands need > 37us to settle
 }
 
 void LiquidCrystal::write4bits(uint8_t value)
 {
-    for (int i = 0; i < 4; i++)
-    {
-        digitalWrite(_data_pins[i], (value >> i) & 0x01);
-    }
-
-    pulseEnable();
+    writeNbits(value, 4);
 }
 
 void LiquidCrystal::write8bits(uint8_t value)
 {
-    for (int i = 0; i < 8; i++)
-    {
-        digitalWrite(_data_pins[i], (value >> i) & 0x01);
-    }
+    writeNbits(value, 8);
+}
 
+void LiquidCrystal::writeNbits(uint8_t value, uint8_t numBits)
+{
+    for (uint8_t i = 0; i < numBits; i++)
+    {
+        digitalWrite(_data_pins[i], (value >> i) & LCD_ENTRY_SHIFT_INCREMENT);
+    }
     pulseEnable();
 }

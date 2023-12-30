@@ -4,36 +4,49 @@
 #include <inttypes.h>
 #include "VirtLiquidCrystal.h"
 
-class LiquidCrystal : public VirtLiquidCrystal{
+#define EXEC_TIME 37
+
+#define DEFAULT_LINES 2
+#define DEFAULT_COLS 16
+
+#ifndef UINT8_MAX 
+#define UINT8_MAX 0xff // 255
+#endif // !UINT8_MAX 
+
+class LiquidCrystal : public VirtLiquidCrystal
+{
 public:
-  LiquidCrystal(uint8_t rs, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-		uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7);
-  LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-		uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7);
-  LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3);
-  LiquidCrystal(uint8_t rs, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3);
+  LiquidCrystal(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LINES, uint8_t charsize = LCD_5x8DOTS,
+                uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
+                uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
+                uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
+                uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE);
 
-  void init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
-	    uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-	    uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7);
-    
-  void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
+  ~LiquidCrystal();
 
-  
-  //using Print::write;
+  void init(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LINES, uint8_t charsize = LCD_5x8DOTS,
+            uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
+            uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
+            uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
+            uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE);
+
+  void begin();
+
+#if defined(ARDUINO_ARCH_ESP32)
+  void analogWrite(uint8_t channel, uint32_t value, uint32_t valueMax = UINT8_MAX);
+#endif
+  void setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE);
+  void setBacklight(uint8_t value);
+  // using Print::write;
 private:
-  void send(uint8_t, uint8_t);
-  void write4bits(uint8_t);
-  void write8bits(uint8_t);
-  void pulseEnable();
+  void send(uint8_t value, uint8_t mode);
+  void write(uint8_t value); //todo remove write()
+  void write4bits(uint8_t value);
+  void write8bits(uint8_t value);
+  void writeNbits(uint8_t value, uint8_t numBits);
 
-  uint8_t _rs_pin; // LOW: command.  HIGH: character.
-  uint8_t _rw_pin; // LOW: write to LCD.  HIGH: read from LCD.
-  uint8_t _enable_pin; // activated by a HIGH pulse.
+  void pulseEnable();
+  uint8_t _backlightPin;
   uint8_t _data_pins[8];
 };
 
