@@ -67,3 +67,27 @@ typedef enum
   POSITIVE,
   NEGATIVE
 } t_backlighPol;
+
+#ifdef 0
+
+// commands
+#define LCD_NOOP 0x00
+#define LCD_CURSORHOME 0x01
+#define LCD_CURSORPOS 0x02
+#define LCD_CURSORPOSXY 0x03
+#define LCD_CURSOROFF 0x04
+#define LCD_CURSORON 0x05
+#define LCD_CURSORBLINK 0x06
+#define LCD_BACKSPACE 0x08
+#define LCD_TAB 0x09
+#define LCD_CURSORDOWN 0x0A
+#define LCD_CURSORUP 0x0B
+#define LCD_CLEARDISPLAY 0x0C
+#define LCD_LINEFEED 0x0D
+#define LCD_CLEARCOLUMN 0x11
+#define LCD_TABSET 0x12
+#define LCD_BACKLIGHTON 0x13
+#define LCD_BACKLIGHTOFF 0x14
+#define LCD_CUSTOMCHAR 0x1B
+
+#endif
