@@ -16,12 +16,12 @@
 #include "I2C_IO.h"
 
 
-I2C_IO::I2C_IO(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_MASK_INPUT, uint8_t pinShadow = I2C_NO_SHADOW)
+I2C_IO::I2C_IO(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_NO_MASK, uint8_t pinShadow = I2C_NO_SHADOW)
 {
    init(i2cAddr, dirMask, pinShadow);
 }
 
-uint8_t I2C_IO::init(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_MASK_INPUT, uint8_t pinShadow = I2C_NO_SHADOW)
+uint8_t I2C_IO::init(uint8_t i2cAddr = I2C_NO_ADDR, uint8_t dirMask = I2C_NO_MASK, uint8_t pinShadow = I2C_NO_SHADOW)
 {
    _i2cAddr = i2cAddr;
    _dirMask = dirMask;
@@ -39,13 +39,15 @@ uint8_t I2C_IO::begin()
    if (_initialised)
    {
 #if (ARDUINO < 100)
+      Serial.println("rec");
       _pinShadow = Wire.receive();
 #else
+      Serial.println("read");
       _pinShadow = Wire.read(); // Remove the byte read don't need it.
 #endif
    
       portMode ( OUTPUT );
-      write(LOW);
+      writeExpander(LOW);
    }
    return (_initialised);
 }
@@ -101,13 +103,13 @@ uint8_t I2C_IO::read(void)
 }
 
 
-uint8_t I2C_IO::write(uint8_t value)
+uint8_t I2C_IO::writeExpander(uint8_t value)
 {
    uint8_t status = 0;
 
    if (_initialised)
    {
-      // Only write HIGH the values of the ports that have been initialised as
+      // Only writeExpander HIGH the values of the ports that have been initialised as
       // outputs updating the output shadow of the device
       _pinShadow = (value & ~(_dirMask)); //_shadow = ( value | _dirMask );
 
@@ -148,7 +150,7 @@ uint8_t I2C_IO::digitalWrite(uint8_t pin, uint8_t level)
    // -------------------------------------------------------------------
    if ((_initialised) && (pin <= 7))
    {
-      // Only write to HIGH the port if the port has been configured as
+      // Only writeExpander to HIGH the port if the port has been configured as
       // an OUTPUT pin. Add the new state of the pin to the shadow
       writeVal = (1 << pin) & ~_dirMask;
       if (level == HIGH)
@@ -159,7 +161,7 @@ uint8_t I2C_IO::digitalWrite(uint8_t pin, uint8_t level)
       {
          _pinShadow &= ~writeVal;
       }
-      status = this->write(_pinShadow);
+      status = this->writeExpander(_pinShadow);
    }
    return (status);
 }

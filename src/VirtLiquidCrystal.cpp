@@ -14,6 +14,9 @@
 
 // PUBLIC METHODS
 // ---------------------------------------------------------------------------
+
+VirtLiquidCrystal::VirtLiquidCrystal(){};
+
 uint8_t VirtLiquidCrystal::init(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS)
 {
    if (lines > 1)
@@ -140,7 +143,7 @@ void VirtLiquidCrystal::setCursor(uint8_t col, uint8_t row)
 
 
 
-void LCDi2c::display(lcd_mode_t mode) 
+void VirtLiquidCrystal::display(lcd_mode_t mode) 
 {
 	switch(mode) 
    {
@@ -182,11 +185,11 @@ void LCDi2c::display(lcd_mode_t mode)
 			break;
 		case BACKLIGHT_ON:
 			backlight();
-			write(0);
+			// write(0);
 			break;
 		case BACKLIGHT_OFF:
 			noBacklight();
-			write(0);
+			// write(0);
 			break;
 		}
 	}

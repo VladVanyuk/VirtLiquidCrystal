@@ -24,20 +24,20 @@
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal::LiquidCrystal(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS,
-                             uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
-                             uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-                             uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-                             uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE)
+LiquidCrystal::LiquidCrystal(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LINES, uint8_t charsize = LCD_5x8DOTS,
+                uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1, uint8_t rw = UINT8_MAX, uint8_t enable = 0,
+                uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
+                uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
+                uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE)
 {
     init(cols, lines, charsize, bitmode, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7, backlighPin, pol);
 }
 
-void LiquidCrystal::init(uint8_t cols, uint8_t lines, uint8_t charsize = LCD_5x8DOTS,
-                         uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
-                         uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
+void LiquidCrystal::init(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LINES, uint8_t charsize = LCD_5x8DOTS,
+                         uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1, uint8_t rw = UINT8_MAX, uint8_t enable = 0,
+                         uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
                          uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-                         uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE)
+                         uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE)
 {
 
     _Rs = rs;
@@ -177,20 +177,20 @@ void LiquidCrystal::send(uint8_t value, uint8_t mode)
     write(value);
 }
 
-void LiquidCrystal::write(uint8_t value)
-{
-    if (_displayfunction & LCD_8BIT_MODE)
-    {
-        write8bits(value);
-    }
-    else
-    {
-        write4bits(value >> 4);
-        write4bits(value);
-    }
+// void LiquidCrystal::write(uint8_t value)
+// {
+//     if (_displayfunction & LCD_8BIT_MODE)
+//     {
+//         write8bits(value);
+//     }
+//     else
+//     {
+//         write4bits(value >> 4);
+//         write4bits(value);
+//     }
 
-    waitMicroseconds(EXEC_TIME);
-}
+//     waitMicroseconds(EXEC_TIME);
+// }
 
 void LiquidCrystal::pulseEnable(void)
 {

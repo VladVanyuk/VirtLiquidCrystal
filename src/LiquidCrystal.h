@@ -17,18 +17,18 @@ class LiquidCrystal : public VirtLiquidCrystal
 {
 public:
   LiquidCrystal(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LINES, uint8_t charsize = LCD_5x8DOTS,
-                uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
-                uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
+                uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1 , uint8_t rw = UINT8_MAX, uint8_t enable = 0,
+                 uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
                 uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-                uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE);
+                uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
 
   ~LiquidCrystal();
 
   void init(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LINES, uint8_t charsize = LCD_5x8DOTS,
-            uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs, uint8_t rw = UINT8_MAX, uint8_t enable,
-            uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
+            uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1, uint8_t rw = UINT8_MAX, uint8_t enable = 0,
+            uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
             uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-            uint8_t backlighPin = 0, t_backlighPol pol = POSITIVE);
+            uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
 
   void begin();
 
@@ -37,10 +37,10 @@ public:
 #endif
   void setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE);
   void setBacklight(uint8_t value);
-  // using Print::write;
+   using Print::write;
 private:
   void send(uint8_t value, uint8_t mode);
-  void write(uint8_t value); //todo remove write()
+  // void write(uint8_t value); //todo remove write()
   void write4bits(uint8_t value);
   void write8bits(uint8_t value);
   void writeNbits(uint8_t value, uint8_t numBits);
