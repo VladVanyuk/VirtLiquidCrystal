@@ -5,11 +5,8 @@
 #include <Arduino.h>
 #endif
 
-#if (ARDUINO < 10000)
-#include <../Wire/Wire.h>
-#else
 #include <Wire.h>
-#endif
+
 
 #include <inttypes.h>
 

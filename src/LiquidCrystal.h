@@ -20,7 +20,7 @@ public:
                 uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1 , uint8_t rw = UINT8_MAX, uint8_t enable = 0,
                  uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
                 uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-                uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
+                uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE);
 
   ~LiquidCrystal();
 
@@ -28,14 +28,14 @@ public:
             uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1, uint8_t rw = UINT8_MAX, uint8_t enable = 0,
             uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
             uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-            uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
+            uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE);
 
   void begin();
 
 #if defined(ARDUINO_ARCH_ESP32)
   void analogWrite(uint8_t channel, uint32_t value, uint32_t valueMax = UINT8_MAX);
 #endif
-  void setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE);
+  void setBacklightPin(uint8_t pin, backlightPol_t pol = POSITIVE);
   void setBacklight(uint8_t value);
    using Print::write;
 private:

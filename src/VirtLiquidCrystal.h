@@ -87,11 +87,11 @@ public:
   
 #if (ARDUINO < 100)
   virtual void write(uint8_t value);
-  virtual void setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE){};
+  virtual void setBacklightPin(uint8_t pin, backlightPol_t pol = POSITIVE){};
   virtual void setBacklight(uint8_t new_val){};
 #else
   virtual size_t write(uint8_t value);
-   virtual void setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE) = 0;
+   virtual void setBacklightPin(uint8_t pin, backlightPol_t pol = POSITIVE) = 0;
    virtual void setBacklight(uint8_t new_val) = 0;
   
 #endif
@@ -109,7 +109,7 @@ public:
   uint8_t _rows;
   uint8_t _cols;
 
-  t_backlightPol _polarity;
+  backlightPol_t _polarity;
   uint8_t _backlightValue;
   // uint8_t _backlightPin;
 

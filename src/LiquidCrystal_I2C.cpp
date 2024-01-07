@@ -18,7 +18,7 @@ LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_addr = LCD_DEFAULT_ADDR, uint8_
 uint8_t LiquidCrystal_I2C::init(uint8_t lcd_addr = LCD_DEFAULT_ADDR, uint8_t lcd_cols = LCD_DEFAULT_COLS, uint8_t lcd_rows = LCD_DEFAULT_ROWS,
                       uint8_t charsize = LCD_5x8DOTS, uint8_t En = LCD_EN, uint8_t Rw = LCD_RW, uint8_t Rs = LCD_RS,
                       uint8_t d4 = LCD_D4, uint8_t d5 = LCD_D5, uint8_t d6 = LCD_D6, uint8_t d7 = LCD_D7,
-                      uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE)
+                      uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE)
 {
   Serial.println("ini start");
   I2C_IO::init(lcd_addr);
@@ -31,7 +31,7 @@ uint8_t LiquidCrystal_I2C::init(uint8_t lcd_addr = LCD_DEFAULT_ADDR, uint8_t lcd
 
 void LiquidCrystal_I2C::config(uint8_t En, uint8_t Rw, uint8_t Rs,
             uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7,
-            uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE)
+            uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE)
 {
   Serial.println("conf start");
   _En = (1 << En);
@@ -72,7 +72,7 @@ void LiquidCrystal_I2C::begin()
   Serial.println("begin end");
 }
 
-void LiquidCrystal_I2C::setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE)
+void LiquidCrystal_I2C::setBacklightPin(uint8_t pin, backlightPol_t pol = POSITIVE)
 {
 
   _backlightPinMask = (1 << pin);

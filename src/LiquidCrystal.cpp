@@ -28,7 +28,7 @@ LiquidCrystal::LiquidCrystal(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAUL
                 uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1, uint8_t rw = UINT8_MAX, uint8_t enable = 0,
                 uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
                 uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-                uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE)
+                uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE)
 {
     init(cols, lines, charsize, bitmode, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7, backlighPin, pol);
 }
@@ -37,7 +37,7 @@ void LiquidCrystal::init(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LI
                          uint8_t bitmode = LCD_4BIT_MODE, uint8_t rs = 1, uint8_t rw = UINT8_MAX, uint8_t enable = 0,
                          uint8_t d0 = 0, uint8_t d1 = 0, uint8_t d2 = 0, uint8_t d3 = 0,
                          uint8_t d4 = 0, uint8_t d5 = 0, uint8_t d6 = 0, uint8_t d7 = 0,
-                         uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE)
+                         uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE)
 {
 
     _Rs = rs;
@@ -68,7 +68,7 @@ void LiquidCrystal::init(uint8_t cols = DEFAULT_COLS, uint8_t lines = DEFAULT_LI
     VirtLiquidCrystal::init(cols, lines, charsize);
 }
 
-void LiquidCrystal::setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE)
+void LiquidCrystal::setBacklightPin(uint8_t pin, backlightPol_t pol = POSITIVE)
 {
     pinMode(pin, OUTPUT); // Difine the backlight pin as output
     _backlightPin = pin;

@@ -66,7 +66,7 @@ typedef enum
 {
   POSITIVE,
   NEGATIVE
-} t_backlightPol;
+} backlightPol_t;
 
 #ifdef 0
 

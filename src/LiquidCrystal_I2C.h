@@ -32,11 +32,11 @@ public:
     uint8_t init(uint8_t lcd_addr = LCD_DEFAULT_ADDR, uint8_t lcd_cols = LCD_DEFAULT_COLS, uint8_t lcd_rows = LCD_DEFAULT_ROWS,
                       uint8_t charsize = LCD_5x8DOTS, uint8_t En = LCD_EN, uint8_t Rw = LCD_RW, uint8_t Rs = LCD_RS,
                       uint8_t d4 = LCD_D4, uint8_t d5 = LCD_D5, uint8_t d6 = LCD_D6, uint8_t d7 = LCD_D7,
-                      uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
+                      uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE);
 
     void begin();
 
-    void setBacklightPin(uint8_t pin, t_backlightPol pol = POSITIVE);
+    void setBacklightPin(uint8_t pin, backlightPol_t pol = POSITIVE);
     void setBacklight(uint8_t new_val);
 
     uint8_t getBacklight();
@@ -47,7 +47,7 @@ public:
 private:
     void config (uint8_t En, uint8_t Rw, uint8_t Rs, 
                     uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7,
-                    uint8_t backlighPin = 0, t_backlightPol pol = POSITIVE);
+                    uint8_t backlighPin = 0, backlightPol_t pol = POSITIVE);
     void send(uint8_t value, uint8_t mode);
     void write4bits(uint8_t value, uint8_t mode);
     // uint8_t write(uint8_t);

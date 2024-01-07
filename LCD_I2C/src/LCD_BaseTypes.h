@@ -1,6 +1,8 @@
 #ifndef LCD_BASE_TYPES_H
 #define LCD_BASE_TYPES_H
 
+#include <Arduino.h>
+
 typedef enum
 {
   POSITIVE,
@@ -39,11 +41,69 @@ enum LCD_Commands
   SET_DDRAM_MASK = 0x7f,      // 0b01111111 // , // Mask (7-bit).
   BIAS_RESISTOR_SET = 0x04,   // 0b00000100 // (1<<2) // Bias resistor select.
   BIAS_RESISTOR_MASK = 0x03,  // 0b00000011 // , // Mask (2-bit).
-  COM_SEG_SET = 0x40,         // 0b01000000 // (1<<6) // COM SEG direction select.
-  COM_SET_MASK = 0x0f,        // 0b00001111 // , // Mask (4 bit).
+  COM_SEG_SET = 0x40,         // 0b 0100 0000 // (1<<6) // COM SEG direction select.
+  COM_SET_MASK = 0x0f,        // 0b 0000 1111 // , // Mask (4 bit).
   SET_DDATA_LENGTH = 0x80,    // 0b10000000 // (1<<7) // Set display data length.
   SET_DDATA_MASK = 0x7f       // 0b01111111 // , // Mask (7 bit, 0..79 => 1..80).
 };
+
+
+// Backlight Control ,  Command Byte Code 
+	enum LCDBackLight_e : uint8_t{
+		LCDBackLightOnMask = 0x0F, /**< XXXX-1111 , Turn on Back light */
+		LCDBackLightOffMask = 0x07 /**< XXXX-0111, Turn off Back light */
+	}; 
+	
+	/*! Entry mode control  set command,  Command Byte Code */
+	enum LCDEntryMode_e : uint8_t{
+		LCDEntryModeOne = 0x04, /**< Display Shift :OFF Decrement Address Counter */
+		LCDEntryModeTwo = 0x05, /**< Display Shift :ON  Decrement Address Counter */
+		LCDEntryModeThree = 0x06, /**< Display Shift :OFF Increment Address Counter, default */
+		LCDEntryModeFour = 0x07 /**<  Display Shift :ON Increment Address Counter */
+	}; 
+
+	/*! Cursor mode, Command Byte Code */
+	enum LCDCursorType_e : uint8_t {
+		LCDCursorTypeOff= 0x0C, /**< Make cursor invisible */
+		LCDCursorTypeBlink = 0x0D, /**< Turn on blinking-block cursor */
+		LCDCursorTypeOn = 0x0E,  /**< Turn on visible  underline cursor */
+		LCDCursorTypeOnBlink  = 0x0F /**<Turn on blinking-block cursor + visible underline cursor */
+	}; 
+	
+	/*! Direction mode for scroll and move */
+	enum LCDDirectionType_e : uint8_t {
+		LCDMoveRight= 1, /**< move or scroll right */
+		LCDMoveLeft = 2   /**< move or scroll left */
+	}; 
+
+	/*! Line Row Number */
+	enum LCDLineNumber_e : uint8_t{
+		LCDLineNumberOne = 1,   /**< row 1 */
+		LCDLineNumberTwo = 2,   /**< row 2 */
+		LCDLineNumberThree = 3, /**< row 3 */
+		LCDLineNumberFour = 4  /**<  row 4 */
+	}; 
+
+
+  /*!  priv DDRAM address's used to set cursor position  Note Private */
+	enum LCDAddress_e : uint8_t {
+		LCDLineAddressOne =  0x80,  /**< Line 1 */
+		LCDLineAddressTwo =  0xC0, /**< Line 2 */
+		LCDLineAddress3Col20 = 0x94, /**< Line 3 20x04 line 3 */
+		LCDLineAddress4Col20 = 0xD4, /**< Line 4 20x04 line 4 */
+		LCDLineAddress3Col16  = 0x90, /**< Line 3 16x04  untested, no part */
+		LCDLineAddress4Col16  = 0xD0 /**< Line 4 16x04 untested, no part */
+	}; 
+
+	/*!  Command Bytes General  Note Private */
+	enum LCDCmdBytesGeneral_e : uint8_t {
+		LCDModeFourBit = 0x28, /**< Function set (4-bit interface, 2 lines, 5*7 Pixels) */
+		LCDHomePosition  = 0x02, /**< Home (move cursor to top/left character position) */
+		LCDDisplayOn = 0x0C,  /**< Restore the display (with cursor hidden) */
+		LCDDisplayOff = 0x08, /**< Blank the display (without clearing) */
+		LCDClearScreen = 0x01 /**< clear screen */
+	};
+
 
 #if 0
 

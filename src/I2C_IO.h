@@ -58,6 +58,8 @@ private:
    uint8_t _i2cAddr;    // I2C address
    bool _initialised;   // Initialised object
 
+   // TwoWire *wire;  /**< I2C wire interface */
+
    bool isAvailable(uint8_t i2cAddr);
 };
 
